@@ -46,13 +46,13 @@ class TTTViewModel : ViewModel() {
 
             try {
                 loginToken = loginJSON.getString("token")
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 loginToken = "" // In case of an invalid login
             }
         }
     }
 
-    fun newGame(token: String){
+    fun newGame(token: String) {
         viewModelScope.launch {
             val newGame = JSONObject().apply {
                 put("token", token)
@@ -69,21 +69,21 @@ class TTTViewModel : ViewModel() {
         }
     }
 
-    fun makeMove(row: Int, column: Int){
+    fun makeMove(row: Int, column: Int) {
         // needs implementation
     }
 
-    fun updateGameStatus(json: JSONObject){
+    fun updateGameStatus(json: JSONObject) {
         val gameArray = json.get("board") as JSONArray
-        val newGameState = Array(3){Array(3){99} }
+        val newGameState = Array(3) { Array(3) { 99 } }
 
-        for(row in 0..2){
+        for (row in 0..2) {
             val rowArray = gameArray[row] as JSONArray
-            for (column in 0..2){
+            for (column in 0..2) {
                 newGameState[row][column] = rowArray[column] as Int
             }
         }
-        gameState  = newGameState
+        gameState = newGameState
         gameOver = json.getBoolean("result")
     }
 

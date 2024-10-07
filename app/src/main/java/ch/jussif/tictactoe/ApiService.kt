@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-const val Base_URL = "http://javaprojects.ch:5005"
+const val Base_URL = "http://javaprojects.ch:50005"
 
 // End Points
 interface ApiService {

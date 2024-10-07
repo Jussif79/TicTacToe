@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TicTacToeTheme {
+                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -42,133 +45,130 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TicTacToe(viewModel: TTTViewModel) {
+fun TicTacToe(tttViewModel: TTTViewModel) {
+    Column(
+        verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(20.dp))
+        ServerBar(tttViewModel)
+        Spacer(modifier = Modifier.height(20.dp))
+        RegisterBar(tttViewModel)
+        Spacer(modifier = Modifier.height(20.dp))
+        LoginBar(tttViewModel)
+        Spacer(modifier = Modifier.height(20.dp))
+        GameBar(tttViewModel)
+        Spacer(modifier = Modifier.height(20.dp))
+        GameArea(tttViewModel)
+    }
+}
+
+@Composable
+fun ServerBar(tttViewModel: TTTViewModel) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(Base_URL)
+        Button(onClick = { tttViewModel.ping() }) { Text("Ping"); }
+        Text(tttViewModel.pingResult.toString())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegisterBar(tttViewModel: TTTViewModel) {
+    var userName by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextField(
+            value = userName,
+            onValueChange = { userName = it },
+            label = { Text("User name") },
+            modifier = Modifier.width(120.dp)
+        )
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.width(120.dp)
+        )
+        Button(
+            enabled = tttViewModel.pingResult == true,
+            onClick = { tttViewModel.register(userName, password) }) { Text("Register") }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginBar(tttViewModel: TTTViewModel) {
+    var userName by rememberSaveable { mutableStateOf("Brad") }
+    var password by rememberSaveable { mutableStateOf("woof") }
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextField(
+            value = userName,
+            onValueChange = { userName = it },
+            label = { Text("User name") },
+            modifier = Modifier.width(120.dp)
+        )
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.width(120.dp)
+        )
+        Button(
+            enabled = tttViewModel.pingResult == true,
+            onClick = { tttViewModel.login(userName, password) }) { Text("Login") }
+    }
+}
+
+@Composable
+fun GameBar(tttViewModel: TTTViewModel) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Token: ${tttViewModel.loginToken}")
+        Button(
+            enabled = !tttViewModel.loginToken.isEmpty(),
+            onClick = { tttViewModel.newGame(tttViewModel.loginToken) }) { Text("New game"); }
+    }
+}
+
+@Composable
+fun GameArea(tttViewModel: TTTViewModel) {
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        ServerBar(viewModel)
-        Spacer(modifier = Modifier.height(20.dp))
-        RegisterBar(viewModel)
-        Spacer(modifier = Modifier.height(20.dp))
-        LoginBar(viewModel)
-        Spacer(modifier = Modifier.height(20.dp))
-        GameBar(viewModel)
-        Spacer(modifier = Modifier.height(20.dp))
-        GameArea(viewModel)
-    }
-}
-
-@Composable
-fun ServerBar(viewModel: TTTViewModel) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(text = "Server: " + Base_URL)
-        Button(onClick = { viewModel.ping() }) { Text(text = "Ping") }
-        Text(text = viewModel.pingResult.toString())
-    }
-}
-
-@Composable
-fun RegisterBar(viewModel: TTTViewModel) {
-    var userName by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        TextField(
-            value = userName,
-            onValueChange = { userName = it },
-            label = { Text(text = "User Name") },
-            modifier = Modifier.width(120.dp)
-        )
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text(text = "Password") },
-            modifier = Modifier.width(120.dp)
-        )
-        Button(
-            enabled = viewModel.pingResult == true,
-            onClick = { viewModel.login(userName, password) }) {
-            Text("Register")
-        }
-    }
-}
-
-@Composable
-fun LoginBar(viewModel: TTTViewModel) {
-    var userName by rememberSaveable { mutableStateOf("Jussif") }
-    var password by rememberSaveable { mutableStateOf("12345") }
-
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        TextField(
-            value = userName,
-            onValueChange = { userName = it },
-            label = { Text(text = "User Name") },
-            modifier = Modifier.width(120.dp)
-        )
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text(text = "Password") },
-            modifier = Modifier.width(120.dp)
-        )
-        Button(
-            enabled = viewModel.pingResult == true,
-            onClick = { viewModel.login(userName, password) }) {
-            Text("Login")
-        }
-    }
-}
-
-@Composable
-fun GameBar(viewModel: TTTViewModel) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Token: ${viewModel.loginToken}")
-        Button(enabled = !viewModel.loginToken.isEmpty(), onClick = { viewModel.newGame(viewModel.loginToken)}){
-            Text("New Game")
-        }
-    }
-}
-
-@Composable
-fun GameArea(viewModel: TTTViewModel) {
-    Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally)  {
-        Row {
-            Column {
-                TTTButton(row = 0, column = 0, viewModel = viewModel)
-                TTTButton(row = 0, column = 1, viewModel = viewModel)
-                TTTButton(row = 0, column = 2, viewModel = viewModel)
+        Row() {
+            Column() {
+                TTTButton(0, 0, tttViewModel)
+                TTTButton(0, 1, tttViewModel)
+                TTTButton(0, 2, tttViewModel)
             }
-            Column {
-                TTTButton(row = 1, column = 0, viewModel = viewModel)
-                TTTButton(row = 1, column = 1, viewModel = viewModel)
-                TTTButton(row = 1, column = 2, viewModel = viewModel)
-
+            Column() {
+                TTTButton(1, 0, tttViewModel)
+                TTTButton(1, 1, tttViewModel)
+                TTTButton(1, 2, tttViewModel)
             }
-            Column {
-                TTTButton(row = 2, column = 0, viewModel = viewModel)
-                TTTButton(row = 2, column = 1, viewModel = viewModel)
-                TTTButton(row = 2, column = 2, viewModel = viewModel)
+            Column() {
+                TTTButton(2, 0, tttViewModel)
+                TTTButton(2, 1, tttViewModel)
+                TTTButton(2, 2, tttViewModel)
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
-        Text(if (viewModel.gameOver) "Game Over!" else "Your Turn!")
+        Text(if (tttViewModel.gameOver) "Game over!" else "Your turn!")
     }
 }
